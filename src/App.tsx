@@ -5,6 +5,7 @@ import { StateBreakdown } from "./components/analytics/StateBreakdown.js";
 import { Board } from "./components/kanban/Board.js";
 import { Shell } from "./components/layout/Shell.js";
 import { StoriesTable } from "./components/table/StoriesTable.js";
+import { TooltipProvider } from "./components/ui/tooltip.js";
 import { useStories } from "./hooks/useStories.js";
 import { useSummary } from "./hooks/useSummary.js";
 import { setGetAccessToken } from "./lib/api.js";
@@ -22,7 +23,7 @@ export function App() {
   if (authLoading) {
     return (
       <Shell>
-        <p className="text-gray-500">Loading...</p>
+        <p className="text-text-secondary">Loading...</p>
       </Shell>
     );
   }
@@ -31,12 +32,16 @@ export function App() {
     return (
       <Shell>
         <div className="flex flex-col items-center justify-center gap-4 py-20">
-          <h2 className="text-lg font-semibold">Welcome to Client Dashboard</h2>
-          <p className="text-gray-500">Sign in to view your sprint data.</p>
+          <h2 className="font-heading text-lg font-semibold text-text-primary">
+            Welcome to Client Dashboard
+          </h2>
+          <p className="text-text-secondary">
+            Sign in to view your sprint data.
+          </p>
           <button
             type="button"
             onClick={() => signIn()}
-            className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
+            className="bg-interactive text-off-white hover:opacity-90 rounded-sm px-4 py-2 font-mono text-sm font-semibold tracking-[0.06em] uppercase"
           >
             Sign In
           </button>
@@ -46,9 +51,11 @@ export function App() {
   }
 
   return (
-    <Shell user={user} onSignOut={() => signOut()}>
-      <Dashboard />
-    </Shell>
+    <TooltipProvider>
+      <Shell user={user} onSignOut={() => signOut()}>
+        <Dashboard />
+      </Shell>
+    </TooltipProvider>
   );
 }
 
@@ -61,7 +68,9 @@ function Dashboard() {
     <>
       {summary && (
         <>
-          <h3 className="mb-3 text-base font-semibold">Analytics</h3>
+          <h3 className="mb-3 font-heading text-lg font-semibold tracking-[0.12em] uppercase text-text-primary">
+            Analytics
+          </h3>
           <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
             {/* <ProgressSummary summary={summary} /> */}
             <StateBreakdown byState={summary.byState} />
@@ -70,14 +79,14 @@ function Dashboard() {
         </>
       )}
 
-      <div className="mb-4 inline-flex rounded-lg border border-gray-200 bg-gray-100 p-0.5">
+      <div className="mb-4 inline-flex bg-bg-surface border border-border-subtle rounded-sm p-0.5">
         <button
           type="button"
           onClick={() => setView("kanban")}
-          className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+          className={`rounded-sm px-3 py-1.5 font-mono text-sm font-medium tracking-[0.06em] uppercase transition-colors ${
             view === "kanban"
-              ? "bg-white text-gray-900 shadow-sm"
-              : "text-gray-500 hover:text-gray-700"
+              ? "bg-bg-card-hover text-text-accent border-b-2 border-interactive"
+              : "text-text-secondary hover:text-text-primary"
           }`}
         >
           Kanban
@@ -85,10 +94,10 @@ function Dashboard() {
         <button
           type="button"
           onClick={() => setView("table")}
-          className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+          className={`rounded-sm px-3 py-1.5 font-mono text-sm font-medium tracking-[0.06em] uppercase transition-colors ${
             view === "table"
-              ? "bg-white text-gray-900 shadow-sm"
-              : "text-gray-500 hover:text-gray-700"
+              ? "bg-bg-card-hover text-text-accent border-b-2 border-interactive"
+              : "text-text-secondary hover:text-text-primary"
           }`}
         >
           Table

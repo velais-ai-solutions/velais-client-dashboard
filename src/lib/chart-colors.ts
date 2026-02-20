@@ -1,20 +1,20 @@
 import type { StoryState } from "@shared/types/index.js";
 
 export const STATE_CHART_COLORS: Record<StoryState, string> = {
-  Planned: "hsl(220, 9%, 60%)",
-  "In Progress": "hsl(213, 94%, 55%)",
-  "In Review": "hsl(45, 93%, 55%)",
-  Completed: "hsl(142, 71%, 45%)",
-  Blocked: "hsl(0, 84%, 60%)",
+  Planned: "#DBE5F5",
+  "In Progress": "#2A5CA1",
+  "In Review": "#627EBF",
+  Completed: "#AECCEB",
+  Blocked: "#8D3D55",
 };
 
 export const ASSIGNEE_COLORS = [
-  "hsl(213, 94%, 55%)",
-  "hsl(142, 71%, 45%)",
-  "hsl(280, 67%, 55%)",
-  "hsl(25, 95%, 55%)",
-  "hsl(45, 93%, 55%)",
-  "hsl(340, 82%, 55%)",
-  "hsl(175, 80%, 40%)",
-  "hsl(0, 84%, 60%)",
+  "#AECCEB",
+  "#627EBF",
+  "#2A5CA1",
+  "#DBE5F5",
+  "#1F3968",
+  "#8D3D55",
+  "#AECCEBCC",
+  "#627EBFCC",
 ];

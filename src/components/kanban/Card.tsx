@@ -1,26 +1,48 @@
 import type { ClientStory } from "@shared/types/index.js";
 import { getInitials } from "@shared/utils.js";
+import { PRIORITY_COLORS } from "../../lib/constants.js";
 import { Avatar } from "../ui/Avatar.js";
 import { Badge } from "../ui/Badge.js";
+import { Card, CardContent } from "../ui/card.js";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip.js";
 
-interface CardProps {
+interface KanbanCardProps {
   story: ClientStory;
 }
 
-export function Card({ story }: CardProps) {
+export function KanbanCard({ story }: KanbanCardProps) {
   return (
-    <div className="rounded border border-gray-200 bg-white p-3">
-      <p className="mb-2 text-sm font-medium">{story.title}</p>
-      <div className="flex items-center gap-2">
-        <Avatar initials={getInitials(story.assignee)} />
-        <span className="text-xs text-gray-500">{story.assignee}</span>
+    <Card className="gap-0 py-0">
+      <CardContent className="px-4 pt-4 pb-3">
+        <p className="font-mono text-sm font-semibold text-text-primary leading-snug">
+          {story.title}
+        </p>
+      </CardContent>
+      <div className="flex items-center justify-between border-t border-border-subtle px-4 py-2.5">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button type="button" className="cursor-default">
+              <Avatar
+                initials={getInitials(story.assignee)}
+                className="h-7 w-7 text-[10px]"
+              />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>{story.assignee}</TooltipContent>
+        </Tooltip>
+        {story.effort > 0 && (
+          <Badge className="bg-bg-surface text-text-secondary font-mono text-xs rounded-sm">
+            {story.effort} pts
+          </Badge>
+        )}
       </div>
-      <div className="mt-2 flex items-center gap-1.5">
-        {story.effort > 0 && <Badge label={`${story.effort} pts`} />}
-        {/* {story.priority !== "Unset" && (
-          <Badge label={story.priority} className={PRIORITY_COLORS[story.priority]} />
-        )} */}
-      </div>
-    </div>
+      {/* {story.priority !== "Unset" && (
+        <div className="border-t border-border-subtle px-4 py-2.5">
+          <Badge className={PRIORITY_COLORS[story.priority]}>
+            {story.priority}
+          </Badge>
+        </div>
+      )} */}
+    </Card>
   );
 }

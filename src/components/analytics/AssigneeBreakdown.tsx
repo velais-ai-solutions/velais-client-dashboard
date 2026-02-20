@@ -25,8 +25,10 @@ export function AssigneeBreakdown({ byAssignee }: AssigneeBreakdownProps) {
   }));
 
   return (
-    <div className="rounded border border-gray-200 bg-white p-4">
-      <h4 className="mb-2 text-sm font-semibold">By Assignee</h4>
+    <div className="bg-bg-card border border-border-subtle rounded-md px-5 py-4">
+      <h4 className="mb-2 font-mono text-sm font-semibold text-text-secondary tracking-[0.06em] uppercase">
+        By Assignee
+      </h4>
       <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
         <BarChart data={data} layout="vertical" margin={{ left: 20 }}>
           <CartesianGrid horizontal={false} />

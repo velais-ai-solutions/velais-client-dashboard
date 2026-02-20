@@ -1,5 +1,13 @@
 import type { StoryState } from "@shared/types/index.js";
 import { STATE_ORDER } from "../../lib/constants.js";
+import { Input } from "../ui/input.js";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select.js";
 
 interface FiltersProps {
   stateFilter: StoryState | "All";
@@ -22,38 +30,46 @@ export function Filters({
 }: FiltersProps) {
   return (
     <div className="mb-3 flex flex-wrap gap-3">
-      <select
+      <Select
         value={stateFilter}
-        onChange={(e) => onStateChange(e.target.value as StoryState | "All")}
-        className="rounded border border-gray-300 px-2 py-1 text-sm"
+        onValueChange={(v) => onStateChange(v as StoryState | "All")}
       >
-        <option value="All">All States</option>
-        {STATE_ORDER.map((s) => (
-          <option key={s} value={s}>
-            {s}
-          </option>
-        ))}
-      </select>
+        <SelectTrigger size="sm">
+          <SelectValue placeholder="All States" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="All">All States</SelectItem>
+          {STATE_ORDER.map((s) => (
+            <SelectItem key={s} value={s}>
+              {s}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-      <select
-        value={assigneeFilter}
-        onChange={(e) => onAssigneeChange(e.target.value)}
-        className="rounded border border-gray-300 px-2 py-1 text-sm"
+      <Select
+        value={assigneeFilter || "all"}
+        onValueChange={(v) => onAssigneeChange(v === "all" ? "" : v)}
       >
-        <option value="">All Assignees</option>
-        {assignees.map((a) => (
-          <option key={a} value={a}>
-            {a}
-          </option>
-        ))}
-      </select>
+        <SelectTrigger size="sm">
+          <SelectValue placeholder="All Assignees" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Assignees</SelectItem>
+          {assignees.map((a) => (
+            <SelectItem key={a} value={a}>
+              {a}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-      <input
+      <Input
         type="text"
         placeholder="Search stories..."
         value={searchQuery}
         onChange={(e) => onSearchChange(e.target.value)}
-        className="rounded border border-gray-300 px-2 py-1 text-sm"
+        className="h-8 w-48"
       />
     </div>
   );

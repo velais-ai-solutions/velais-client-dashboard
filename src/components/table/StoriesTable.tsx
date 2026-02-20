@@ -3,6 +3,14 @@ import { useMemo, useState } from "react";
 import { STATE_COLORS, STATE_ORDER } from "../../lib/constants.js";
 import { Badge } from "../ui/Badge.js";
 import { Skeleton } from "../ui/Skeleton.js";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../ui/table.js";
 import { Filters } from "./Filters.js";
 
 interface StoriesTableProps {
@@ -95,7 +103,9 @@ export function StoriesTable({ stories, isLoading }: StoriesTableProps) {
 
   return (
     <div className="mb-6">
-      <h3 className="mb-3 text-base font-semibold">Stories</h3>
+      <h3 className="mb-3 font-heading text-lg font-semibold tracking-[0.12em] uppercase text-text-primary">
+        Stories
+      </h3>
       <Filters
         stateFilter={stateFilter}
         assigneeFilter={assigneeFilter}
@@ -105,67 +115,59 @@ export function StoriesTable({ stories, isLoading }: StoriesTableProps) {
         onAssigneeChange={setAssigneeFilter}
         onSearchChange={setSearchQuery}
       />
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-gray-200 text-xs text-gray-500">
-              <th className="pb-2 pr-4">ID</th>
-              <th className="pb-2 pr-4">Title</th>
-              <th
-                className="cursor-pointer pb-2 pr-4"
-                onClick={() => toggleSort("state")}
-              >
-                State{sortIndicator("state")}
-              </th>
-              <th
-                className="cursor-pointer pb-2 pr-4"
-                onClick={() => toggleSort("assignee")}
-              >
-                Assignee{sortIndicator("assignee")}
-              </th>
-              <th
-                className="cursor-pointer pb-2 pr-4"
-                onClick={() => toggleSort("effort")}
-              >
-                Effort{sortIndicator("effort")}
-              </th>
-              {/* <th
-                className="cursor-pointer pb-2 pr-4"
-                onClick={() => toggleSort("priority")}
-              >
-                Priority{sortIndicator("priority")}
-              </th> */}
-              <th className="pb-2">Updated</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((story) => (
-              <tr
-                key={story.id}
-                className="border-b border-gray-100 hover:bg-gray-50"
-              >
-                <td className="py-2 pr-4 text-gray-400">{story.id}</td>
-                <td className="py-2 pr-4 font-medium">{story.title}</td>
-                <td className="py-2 pr-4">
-                  <Badge
-                    label={story.state}
-                    className={STATE_COLORS[story.state]}
-                  />
-                </td>
-                <td className="py-2 pr-4">{story.assignee}</td>
-                <td className="py-2 pr-4">{story.effort || "—"}</td>
-                {/* <td className="py-2 pr-4">
-                  <Badge
-                    label={story.priority}
-                    className={PRIORITY_COLORS[story.priority]}
-                  />
-                </td> */}
-                <td className="py-2 text-gray-400">{story.lastUpdated}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>ID</TableHead>
+            <TableHead>Title</TableHead>
+            <TableHead
+              className="cursor-pointer"
+              onClick={() => toggleSort("state")}
+            >
+              State{sortIndicator("state")}
+            </TableHead>
+            <TableHead
+              className="cursor-pointer"
+              onClick={() => toggleSort("assignee")}
+            >
+              Assignee{sortIndicator("assignee")}
+            </TableHead>
+            <TableHead
+              className="cursor-pointer"
+              onClick={() => toggleSort("effort")}
+            >
+              Effort{sortIndicator("effort")}
+            </TableHead>
+            <TableHead>Updated</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {filtered.map((story) => (
+            <TableRow key={story.id}>
+              <TableCell className="text-text-secondary font-mono">
+                {story.id}
+              </TableCell>
+              <TableCell className="text-text-primary font-mono font-medium">
+                {story.title}
+              </TableCell>
+              <TableCell>
+                <Badge className={STATE_COLORS[story.state]}>
+                  {story.state}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-text-primary font-mono text-sm">
+                {story.assignee}
+              </TableCell>
+              <TableCell className="text-text-primary font-mono text-sm">
+                {story.effort || "—"}
+              </TableCell>
+              <TableCell className="text-text-secondary font-mono text-sm tracking-[0.03em]">
+                {story.lastUpdated}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }

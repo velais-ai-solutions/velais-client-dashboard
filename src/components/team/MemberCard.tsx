@@ -7,11 +7,13 @@ interface MemberCardProps {
 
 export function MemberCard({ member }: MemberCardProps) {
   return (
-    <div className="flex items-center gap-3 rounded border border-gray-200 bg-white p-3">
+    <div className="flex items-center gap-3 bg-bg-card border border-border-subtle rounded-md px-5 py-3">
       <Avatar initials={member.initials} />
       <div>
-        <p className="text-sm font-medium">{member.name}</p>
-        <p className="text-xs text-gray-400">
+        <p className="font-mono text-sm font-medium text-text-primary">
+          {member.name}
+        </p>
+        <p className="font-mono text-xs text-text-secondary">
           {member.storiesCount} stories · {member.pointsCompleted}/
           {member.pointsTotal} pts
         </p>

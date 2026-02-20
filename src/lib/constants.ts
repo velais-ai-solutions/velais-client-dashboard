@@ -1,19 +1,19 @@
 import type { Priority, StoryState } from "@shared/types/index.js";
 
 export const STATE_COLORS: Record<StoryState, string> = {
-  Planned: "bg-gray-100 text-gray-700",
-  "In Progress": "bg-blue-100 text-blue-700",
-  "In Review": "bg-yellow-100 text-yellow-700",
-  Completed: "bg-green-100 text-green-700",
-  Blocked: "bg-red-100 text-red-700",
+  Planned: "bg-status-inactive-muted text-status-inactive",
+  "In Progress": "bg-status-building-muted text-status-building",
+  "In Review": "bg-status-review-muted text-status-review",
+  Completed: "bg-status-live-muted text-status-live",
+  Blocked: "bg-status-failed-muted text-status-failed",
 };
 
 export const PRIORITY_COLORS: Record<Priority, string> = {
-  Critical: "bg-red-100 text-red-700",
-  High: "bg-orange-100 text-orange-700",
-  Medium: "bg-yellow-100 text-yellow-700",
-  Low: "bg-blue-100 text-blue-700",
-  Unset: "bg-gray-100 text-gray-500",
+  Critical: "bg-status-failed-muted text-status-failed",
+  High: "bg-status-building-muted text-status-building",
+  Medium: "bg-status-review-muted text-status-review",
+  Low: "bg-status-inactive-muted text-status-inactive",
+  Unset: "bg-bg-surface text-text-secondary",
 };
 
 export const STATE_ORDER: StoryState[] = [

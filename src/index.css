@@ -1,5 +1,142 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap");
+
+@font-face {
+  font-family: "Onsite Extended";
+  src:
+    url("./fonts/OnsiteExtended-Regular.woff2") format("woff2"),
+    url("./fonts/OnsiteExtended-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 
 @theme {
-  --font-sans: "Inter", sans-serif;
+  /* ── Fonts ── */
+  --font-heading: "Onsite Extended", sans-serif;
+  --font-body: "IBM Plex Mono", monospace;
+  --font-mono: "IBM Plex Mono", monospace;
+
+  /* ── Brand palette ── */
+  --color-soft-sky: #aecceb;
+  --color-muted-blue: #627ebf;
+  --color-energetic-blue: #2a5ca1;
+  --color-cloudy-blue: #dbe5f5;
+  --color-deep-navy: #1f3968;
+  --color-midnight-blue: #0b1b3e;
+  --color-off-black: #0f1118;
+  --color-off-white: #fbfaf4;
+  --color-muted-burgundy: #8d3d55;
+
+  /* ── Backgrounds (neutral-dark base, brand blues via borders/text) ── */
+  --color-bg-deep: #0f1118;
+  --color-bg-panel: #13151f;
+  --color-bg-card: #1a1d2b;
+  --color-bg-surface: #10121a;
+  --color-bg-card-hover: #22263a;
+
+  /* ── Text ── */
+  --color-text-primary: #fbfaf4;
+  --color-text-secondary: #aecceb;
+  --color-text-tertiary: #627ebf;
+  --color-text-accent: #dbe5f5;
+
+  /* ── Interactive ── */
+  --color-interactive: #2a5ca1;
+
+  /* ── Borders ── */
+  --color-border-subtle: #1f3968;
+  --color-border-default: #2a5ca1;
+  --color-border-hover: #627ebf;
+
+  /* ── Status ── */
+  --color-status-live: #aecceb;
+  --color-status-building: #2a5ca1;
+  --color-status-inactive: #dbe5f5;
+  --color-status-failed: #8d3d55;
+  --color-status-review: #627ebf;
+
+  /* ── Status badge backgrounds (18% opacity for visibility) ── */
+  --color-status-live-muted: rgba(174, 204, 235, 0.18);
+  --color-status-building-muted: rgba(42, 92, 161, 0.18);
+  --color-status-inactive-muted: rgba(219, 229, 245, 0.18);
+  --color-status-failed-muted: rgba(141, 61, 85, 0.18);
+  --color-status-review-muted: rgba(98, 126, 191, 0.18);
+
+  /* ── Radii ── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* ── Breakpoints ── */
+  --breakpoint-sm: 480px;
+  --breakpoint-md: 768px;
+
+  /* ── Legacy shadcn token mapping ── */
+  --color-background: #0f1118;
+  --color-foreground: #fbfaf4;
+  --color-card: #1a1d2b;
+  --color-card-foreground: #fbfaf4;
+  --color-popover: #13151f;
+  --color-popover-foreground: #fbfaf4;
+  --color-primary: #2a5ca1;
+  --color-primary-foreground: #fbfaf4;
+  --color-secondary: #13151f;
+  --color-secondary-foreground: #aecceb;
+  --color-muted: #13151f;
+  --color-muted-foreground: #aecceb;
+  --color-accent: #22263a;
+  --color-accent-foreground: #fbfaf4;
+  --color-destructive: #8d3d55;
+  --color-destructive-foreground: #8d3d55;
+  --color-border: #1f3968;
+  --color-input: #1f3968;
+  --color-ring: #2a5ca1;
+}
+
+html {
+  font-size: 14px;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-bg-deep);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+}
+
+/* ── Custom scrollbar ── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-subtle);
+  border-radius: 9999px;
+}
+
+/* ── Pulse dot animation ── */
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
