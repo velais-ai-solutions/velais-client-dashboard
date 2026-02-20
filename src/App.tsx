@@ -85,7 +85,9 @@ function AuthenticatedShell({
 
 function Dashboard({
   summary,
-}: { summary?: ReturnType<typeof useSummary>["data"] }) {
+}: {
+  summary?: ReturnType<typeof useSummary>["data"];
+}) {
   const { data: stories, isLoading: storiesLoading } = useStories();
   const [view, setView] = useState<"kanban" | "table">("kanban");
 

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { useCascadeAnimation } from "@/hooks/useCascadeAnimation.js";
+
 // import logo from "@/assets/Logo Symbol_Variable Width.svg";
 
 interface ShellProps {

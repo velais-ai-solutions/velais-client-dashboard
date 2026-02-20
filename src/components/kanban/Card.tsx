@@ -1,6 +1,6 @@
 import type { ClientStory } from "@shared/types/index.js";
 import { getInitials } from "@shared/utils.js";
-import { PRIORITY_COLORS } from "../../lib/constants.js";
+
 import { Avatar } from "../ui/Avatar.js";
 import { Badge } from "../ui/Badge.js";
 import { Card, CardContent } from "../ui/card.js";
