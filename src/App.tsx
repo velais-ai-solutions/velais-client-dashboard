@@ -43,6 +43,12 @@ export function App() {
     setGetAccessToken(getAccessToken);
   }, [getAccessToken]);
 
+  const { isLoading: storiesLoading } = useStories({ enabled: !!user });
+  const { isLoading: summaryLoading } = useSummary({ enabled: !!user });
+
+  const dataReady =
+    !authLoading && (!user || (!storiesLoading && !summaryLoading));
+
   const [showLoader, setShowLoader] = useState(true);
 
   const handleLoaderComplete = useCallback(() => {
@@ -50,9 +56,7 @@ export function App() {
   }, []);
 
   if (showLoader) {
-    return (
-      <Loader dataReady={!authLoading} onComplete={handleLoaderComplete} />
-    );
+    return <Loader dataReady={dataReady} onComplete={handleLoaderComplete} />;
   }
 
   if (!user) {
