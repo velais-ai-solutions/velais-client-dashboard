@@ -91,7 +91,12 @@ export function transformWorkItem(item: AzureWorkItem): ClientStory {
 
 export function buildSummary(
   stories: ClientStory[],
-  iteration: { name: string; startDate: string; endDate: string },
+  iteration: {
+    projectName: string;
+    name: string;
+    startDate: string;
+    endDate: string;
+  },
 ): SprintSummary {
   const hasValidDates = Boolean(iteration.startDate && iteration.endDate);
   const start = hasValidDates ? new Date(iteration.startDate) : null;
@@ -172,6 +177,7 @@ export function buildSummary(
   const progress = totalPoints > 0 ? (completedPoints / totalPoints) * 100 : 0;
 
   return {
+    projectName: iteration.projectName,
     sprintName: iteration.name,
     startDate: iteration.startDate,
     endDate: iteration.endDate,

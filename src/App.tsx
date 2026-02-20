@@ -57,16 +57,36 @@ export function App() {
 
   return (
     <TooltipProvider>
-      <Shell user={user} onSignOut={() => signOut()} animate>
-        <Dashboard />
-      </Shell>
+      <AuthenticatedShell user={user} onSignOut={() => signOut()} />
     </TooltipProvider>
   );
 }
 
-function Dashboard() {
-  const { data: stories, isLoading: storiesLoading } = useStories();
+function AuthenticatedShell({
+  user,
+  onSignOut,
+}: {
+  user: { firstName?: string | null; lastName?: string | null };
+  onSignOut: () => void;
+}) {
   const { data: summary } = useSummary();
+
+  return (
+    <Shell
+      user={user}
+      onSignOut={onSignOut}
+      projectName={summary?.projectName}
+      animate
+    >
+      <Dashboard summary={summary} />
+    </Shell>
+  );
+}
+
+function Dashboard({
+  summary,
+}: { summary?: ReturnType<typeof useSummary>["data"] }) {
+  const { data: stories, isLoading: storiesLoading } = useStories();
   const [view, setView] = useState<"kanban" | "table">("kanban");
 
   return (

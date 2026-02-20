@@ -31,6 +31,7 @@ summary.get("/", async (c) => {
     const stories = workItems.map(transformWorkItem);
 
     const sprintSummary = buildSummary(stories, {
+      projectName: tenant.project,
       name: iteration.name,
       startDate: iteration.attributes.startDate,
       endDate: iteration.attributes.finishDate,

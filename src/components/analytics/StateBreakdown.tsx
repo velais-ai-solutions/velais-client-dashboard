@@ -41,7 +41,7 @@ export function StateBreakdown({ byState }: StateBreakdownProps) {
       </h4>
       <ChartContainer
         config={chartConfig}
-        className="mx-auto aspect-square max-w-[90%]"
+        className="mx-auto aspect-square max-w-[90%] max-md:max-w-full"
       >
         <PieChart>
           <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
@@ -57,7 +57,14 @@ export function StateBreakdown({ byState }: StateBreakdownProps) {
               <Cell key={entry.name} fill={entry.fill} />
             ))}
           </Pie>
-          <ChartLegend content={<ChartLegendContent nameKey="name" />} />
+          <ChartLegend
+            content={
+              <ChartLegendContent
+                nameKey="name"
+                className="flex-wrap gap-x-3 gap-y-1"
+              />
+            }
+          />
         </PieChart>
       </ChartContainer>
     </div>

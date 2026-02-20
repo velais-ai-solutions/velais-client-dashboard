@@ -35,6 +35,7 @@ export interface TeamMember {
 }
 
 export interface SprintSummary {
+  projectName: string;
   sprintName: string;
   startDate: string | null;
   endDate: string | null;
