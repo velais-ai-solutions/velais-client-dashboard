@@ -25,26 +25,36 @@ bun run format                 # biome check --fix .
 ### Directory Layout
 
 - `src/` — React client app
-  - `components/ui/` — shadcn-style primitives (card, chart, Avatar, Badge, Skeleton)
+  - `components/ui/` — shadcn-style primitives (card, chart, Avatar, Badge, Skeleton, input, select, tooltip, scroll-area, table)
   - `components/kanban/` — Kanban board (Board → Column → Card)
-  - `components/table/` — Table view with filters
-  - `components/analytics/` — Recharts dashboard (StateBreakdown, ProgressSummary, AssigneeBreakdown)
-  - `components/layout/` — Shell wrapper (project name in header, cascade animation) and SprintHeader
+  - `components/table/` — Table view with filters (StoriesTable, Filters)
+  - `components/analytics/` — Recharts charts (StateBreakdown, AssigneeBreakdown); loaded lazily via `React.lazy()`
+  - `components/layout/` — Shell wrapper (sticky header, project name, sign-out button, cascade animation) and SprintHeader
+  - `components/team/` — Team member display; `MemberCard` renders name, initials avatar, story count, and points progress
   - `components/Loader.tsx` — Branded full-screen loading overlay; animated SVG logo with diagonal fill progress + shimmer sweep; shown while WorkOS auth resolves
   - `components/LoginPage.tsx` — Branded login page; GSAP timeline animates logo, wordmark, divider, subtitle, button, and footer in sequence
   - `hooks/` — `useStories`, `useSummary` (React Query wrappers), `useCascadeAnimation` (GSAP page-entry hook)
   - `lib/gsap.ts` — GSAP singleton: registers `CustomEase`, defines `"snappy"` ease preset, re-exports `gsap` and `useGSAP`
   - `lib/logo.ts` — Shared `LOGO_PATH` and `LOGO_VIEWBOX` SVG constants used by Loader and LoginPage
-  - `lib/` — API client, query-client config, utilities, constants, chart colors
+  - `lib/api.ts` — API client; injects Bearer token via `setGetAccessToken`; redirects to `/` on 401
+  - `lib/query-client.ts` — React Query client config: 10-min stale time, 30-min GC time, no refetch on focus, 2 retries
+  - `lib/constants.ts` — `STATE_COLORS`, `PRIORITY_COLORS`, `STATE_ORDER` (typed against shared types)
+  - `lib/utils.ts` — `cn()` helper (clsx + twMerge)
+  - `lib/chart-colors.ts` — Recharts color palette
 - `server/` — Hono backend
-  - `middleware/auth.ts` — WorkOS JWT verification
-  - `middleware/cache.ts` — In-memory cache (10-min TTL, ETag, LRU at 500 entries)
-  - `routes/` — `stories`, `summary`, `iterations` endpoints
-  - `services/azure-devops.ts` — Azure DevOps WIQL client
-  - `services/transform.ts` — Work item → ClientStory transformation
-  - `tenants.ts` — Org ID → Azure DevOps project/team mapping
+  - `dev.ts` — Development entry point; validates required env vars at startup, then dynamically imports `app.ts`; runs on `PORT` env var or 3001
+  - `app.ts` — Hono app root; registers logger, health routes, `authMiddleware`, `cacheMiddleware()`, and sub-routers; global error handler
+  - `middleware/auth.ts` — WorkOS JWT verification via JWKS; health routes bypass auth; sets `tenant` and `userId` on Hono context; returns 403 for unknown orgs
+  - `middleware/cache.ts` — In-memory GET cache; 10-min TTL, ETag + `If-None-Match` support, `Cache-Control: private, max-age=600`; two-pass LRU eviction (expire → oldest single entry) at 500 entries; cache key is `{tenantSlug}:{pathname}:{search}`
+  - `routes/stories.ts` — Fetches current iteration → WIQL → work item details → transforms; returns `ClientStory[]`
+  - `routes/summary.ts` — Same fetch chain as stories; calls `buildSummary`; returns `SprintSummary`
+  - `routes/iterations.ts` — Fetches current iteration only; calls `buildIterationInfo`; returns `IterationInfo`
+  - `services/azure-devops.ts` — Azure DevOps WIQL client; 30s `AbortController` timeout per request; WIQL injection escaping via `wiqlEscape()`; 200-item batch limit for work item details; structured `[azure]` log lines on error
+  - `services/transform.ts` — `transformWorkItem()` (AzureWorkItem → ClientStory), `buildSummary()` (stories + iteration metadata → SprintSummary including `teamMembers`), `buildIterationInfo()` (iteration → IterationInfo)
+  - `tenants.ts` — `TenantConfig` (`slug`, `project`, `team`); `tenantMap` (orgId → config); `resolveTenant(orgId)`
 - `shared/` — Types and utilities shared between client and server
-  - `types/index.ts` — `ClientStory`, `SprintSummary`, `StoryState`, `Priority`, etc.
+  - `types/index.ts` — `ClientStory`, `SprintSummary`, `StoryState`, `Priority`, `AssigneeSummary`, `TeamMember`, `IterationInfo`
+  - `utils.ts` — `getInitials(name)` — splits display name and returns up to 2 uppercase initials
 - `api/[[...route]].ts` — Vercel edge function catch-all (proxies to Hono app)
 
 ### Application Render Phases
@@ -59,17 +69,39 @@ bun run format                 # biome check --fix .
 
 ```
 React hooks (useStories/useSummary)
-  → React Query (10-min stale time)
+  → React Query (10-min stale time, 30-min GC)
     → /api/* endpoints
-      → Auth middleware (WorkOS JWT)
-        → Cache middleware (hit → 304/cached response)
-          → Azure DevOps API (WIQL queries)
-            → Transform service (normalize states/priorities)
+      → Auth middleware (WorkOS JWT, sets tenant + userId)
+        → Cache middleware (hit → 304 or cached JSON with ETag)
+          → Azure DevOps API (WIQL queries, 30s timeout, 200-item batches)
+            → Transform service (normalize states/priorities, build summaries)
 ```
+
+### State and Priority Mapping
+
+`STATE_MAP` in `transform.ts` normalizes Azure DevOps states to `StoryState`:
+
+| Azure State | StoryState |
+|---|---|
+| New, To Do | Planned |
+| Active, In Progress | In Progress |
+| Resolved, QA, In Review | In Review |
+| Closed, Done, Completed | Completed |
+| Blocked | Blocked |
+
+`PRIORITY_MAP`: 1 → Critical, 2 → High, 3 → Medium, 4 → Low; absent/null → Unset.
+
+Unknown Azure states default to `"Planned"`.
 
 ### Multi-Tenancy
 
-Org ID from JWT maps to tenant config in `server/tenants.ts`, which determines the Azure DevOps project and team. Cache keys are per-tenant to prevent cross-tenant data leaks.
+Org ID from JWT maps to `TenantConfig` in `server/tenants.ts` (`slug`, `project`, `team`). Cache keys are `{slug}:{pathname}:{search}` to prevent cross-tenant data leaks.
+
+### React 19 Patterns
+
+- **`Activity`** — Both Kanban and Table views are rendered inside `<Activity mode="visible"|"hidden">`. This keeps both views mounted, preserving state and avoiding remount cost on switch.
+- **`startTransition`** — View toggle calls `startTransition(() => setView(newView))` to deprioritize the re-render and keep the UI responsive.
+- **`React.lazy()` + `Suspense`** — Analytics components (`StateBreakdown`, `AssigneeBreakdown`) are code-split. Each is wrapped in `<Suspense fallback={<Skeleton />}>`.
 
 ### GSAP Animation Patterns
 
@@ -94,13 +126,14 @@ Org ID from JWT maps to tenant config in `server/tenants.ts`, which determines t
 - **Formatting:** Biome with 2-space indent, double quotes
 - **Styling:** Tailwind utilities + `cn()` helper (clsx + twMerge)
 - **shadcn UI:** New York style, configured via `components.json`
-- **API auth:** Bearer token in Authorization header, verified via WorkOS on every request
-- **State mapping:** Azure DevOps states → normalized `StoryState` (Planned, In Progress, Review, Testing, Done, Removed)
-- **Error flow:** API 401 → redirect to home; Azure errors → 502
+- **API auth:** Bearer token in Authorization header, verified via WorkOS on every request (health routes exempt)
+- **Error flow:** API 401 → `window.location.href = "/"` on client; Azure errors → 502; unknown org → 403
+- **Table filtering:** client-side, computed via `useMemo`; supports state, assignee, and free-text search across title + tags; sorting by state, assignee, or priority
+- **Shared utilities:** Always import `getInitials` from `@shared/utils` — it is used by both `transform.ts` (server) and any client component that needs initials
 
 ### Environment Variables
 
-See `.env.example`. Required: `WORKOS_API_KEY`, `WORKOS_CLIENT_ID`, `VITE_WORKOS_CLIENT_ID`, `AZURE_DEVOPS_ORG`, `AZURE_DEVOPS_PAT`.
+See `.env.example`. Required: `WORKOS_API_KEY`, `WORKOS_CLIENT_ID`, `VITE_WORKOS_CLIENT_ID`, `AZURE_DEVOPS_ORG`, `AZURE_DEVOPS_PAT`. The dev server (`server/dev.ts`) validates these at startup and exits with a clear message if any are missing.
 
 ### Deployment
 
