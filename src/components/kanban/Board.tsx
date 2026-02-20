@@ -1,4 +1,5 @@
 import type { ClientStory } from "@shared/types/index.js";
+import { useMemo } from "react";
 import { STATE_ORDER } from "../../lib/constants.js";
 import { Skeleton } from "../ui/Skeleton.js";
 import { Column } from "./Column.js";
@@ -24,14 +25,19 @@ const BOARD_SKELETON = (
 );
 
 export function Board({ stories, isLoading }: BoardProps) {
+  const grouped = useMemo(() => {
+    const map = new Map(STATE_ORDER.map((s) => [s, [] as ClientStory[]]));
+    if (stories) {
+      for (const story of stories) {
+        map.get(story.state)?.push(story);
+      }
+    }
+    return map;
+  }, [stories]);
+
   if (isLoading) return BOARD_SKELETON;
 
   if (!stories) return null;
-
-  const grouped = new Map(STATE_ORDER.map((s) => [s, [] as ClientStory[]]));
-  for (const story of stories) {
-    grouped.get(story.state)?.push(story);
-  }
 
   return (
     <div className="mb-6">

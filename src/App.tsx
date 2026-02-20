@@ -5,6 +5,7 @@ import {
   Suspense,
   startTransition,
   useCallback,
+  useEffect,
   useState,
 } from "react";
 import { Board } from "./components/kanban/Board.js";
@@ -38,7 +39,9 @@ export function App() {
     signOut,
     getAccessToken,
   } = useAuth();
-  setGetAccessToken(getAccessToken);
+  useEffect(() => {
+    setGetAccessToken(getAccessToken);
+  }, [getAccessToken]);
 
   const [showLoader, setShowLoader] = useState(true);
 

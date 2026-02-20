@@ -1,4 +1,5 @@
 import type { AssigneeSummary } from "@shared/types/index.js";
+import { useMemo } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, XAxis, YAxis } from "recharts";
 import { ASSIGNEE_COLORS } from "../../lib/chart-colors.js";
 import {
@@ -17,12 +18,16 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function AssigneeBreakdown({ byAssignee }: AssigneeBreakdownProps) {
-  const data = byAssignee.map((a, i) => ({
-    name: a.name,
-    points: a.points,
-    count: a.count,
-    fill: ASSIGNEE_COLORS[i % ASSIGNEE_COLORS.length]!,
-  }));
+  const data = useMemo(
+    () =>
+      byAssignee.map((a, i) => ({
+        name: a.name,
+        points: a.points,
+        count: a.count,
+        fill: ASSIGNEE_COLORS[i % ASSIGNEE_COLORS.length]!,
+      })),
+    [byAssignee],
+  );
 
   return (
     <div

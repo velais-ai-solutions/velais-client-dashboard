@@ -1,4 +1,5 @@
 import type { StoryState } from "@shared/types/index.js";
+import { useMemo } from "react";
 import { Cell, Pie, PieChart } from "recharts";
 import { STATE_CHART_COLORS } from "../../lib/chart-colors.js";
 import { STATE_ORDER } from "../../lib/constants.js";
@@ -23,12 +24,14 @@ const chartConfig = Object.fromEntries(
 ) as ChartConfig;
 
 export function StateBreakdown({ byState }: StateBreakdownProps) {
-  const data = STATE_ORDER.filter((state) => byState[state] > 0).map(
-    (state) => ({
-      name: state,
-      value: byState[state],
-      fill: STATE_CHART_COLORS[state],
-    }),
+  const data = useMemo(
+    () =>
+      STATE_ORDER.filter((state) => byState[state] > 0).map((state) => ({
+        name: state,
+        value: byState[state],
+        fill: STATE_CHART_COLORS[state],
+      })),
+    [byState],
   );
 
   return (
