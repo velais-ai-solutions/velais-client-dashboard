@@ -22,4 +22,6 @@ console.log(`Hono API server running on http://localhost:${port}`);
 export default {
   fetch: app.fetch,
   port,
+  // Listen on all interfaces so *.lvh.me subdomains work in development
+  hostname: "0.0.0.0",
 };

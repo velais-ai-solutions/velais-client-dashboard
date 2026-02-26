@@ -4,6 +4,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App.js";
 import { queryClient } from "./lib/query-client.js";
+import { TenantProvider } from "./lib/tenant.js";
 import "./index.css";
 
 const clientId = import.meta.env.VITE_WORKOS_CLIENT_ID;
@@ -15,14 +16,16 @@ if (!clientId) {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <AuthKitProvider
-      clientId={clientId}
-      redirectUri={`${window.location.origin}/callback`}
-      devMode
-    >
-      <QueryClientProvider client={queryClient}>
-        <App />
-      </QueryClientProvider>
-    </AuthKitProvider>
+    <TenantProvider>
+      <AuthKitProvider
+        clientId={clientId}
+        redirectUri={`${window.location.origin}/callback`}
+        devMode={import.meta.env.DEV}
+      >
+        <QueryClientProvider client={queryClient}>
+          <App />
+        </QueryClientProvider>
+      </AuthKitProvider>
+    </TenantProvider>
   </StrictMode>,
 );
