@@ -1,10 +1,11 @@
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import mkcert from "vite-plugin-mkcert";
 import { defineConfig } from "vite";
 import path from "node:path";
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), mkcert()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -12,6 +13,7 @@ export default defineConfig({
     },
   },
   server: {
+    host: true,
     // Allow *.lvh.me subdomains for local multi-tenant development
     allowedHosts: [".lvh.me", "localhost"],
     proxy: {

@@ -18,6 +18,8 @@ import { TooltipProvider } from "./components/ui/tooltip.js";
 import { useStories } from "./hooks/useStories.js";
 import { useSummary } from "./hooks/useSummary.js";
 import { setGetAccessToken } from "./lib/api.js";
+import { useTenant } from "./lib/tenant.js";
+import { slugToOrgId } from "@shared/tenants.js";
 
 const StateBreakdown = lazy(() =>
   import("./components/analytics/StateBreakdown.js").then((m) => ({
@@ -39,6 +41,7 @@ export function App() {
     signOut,
     getAccessToken,
   } = useAuth();
+  const tenant = useTenant();
   useEffect(() => {
     setGetAccessToken(getAccessToken);
   }, [getAccessToken]);
@@ -60,7 +63,8 @@ export function App() {
   }
 
   if (!user) {
-    return <LoginPage onSignIn={() => signIn()} />;
+    const organizationId = tenant ? slugToOrgId.get(tenant.slug) : undefined;
+    return <LoginPage onSignIn={() => signIn({ organizationId })} />;
   }
 
   return (
