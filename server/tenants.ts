@@ -12,8 +12,8 @@ export const tenantMap: Record<string, TenantConfig> = {
   },
   org_01KJ9V64J25YSFA4RCKZ9FGPTC: {
     slug: "kablee-srl",
-    project: "Kablee Srl - Custom AI Product Development",
-    team: "Kablee Srl - Custom AI Product Development Team"
+    project: "Kablee Srl -  Custom AI Product Development",
+    team: "Kablee Srl -  Custom AI Product Development Team"
   }
 };
 
