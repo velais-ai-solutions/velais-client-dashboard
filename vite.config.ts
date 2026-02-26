@@ -12,10 +12,13 @@ export default defineConfig({
     },
   },
   server: {
+    // Allow *.lvh.me subdomains for local multi-tenant development
+    allowedHosts: [".lvh.me", "localhost"],
     proxy: {
       "/api": {
         target: "http://localhost:3001",
-        changeOrigin: true,
+        // Preserve original Host header so backend can extract subdomain
+        changeOrigin: false,
       },
     },
   },

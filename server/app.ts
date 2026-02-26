@@ -8,17 +8,24 @@ import iterations from "./routes/iterations.js";
 import stories from "./routes/stories.js";
 import summary from "./routes/summary.js";
 import { getCurrentIteration } from "./services/azure-devops.js";
-import { tenantMap } from "./tenants.js";
+import { tenantsByOrg } from "./tenants.js";
 
 const app = new Hono<AuthEnv>().basePath("/api");
 
 app.use("*", secureHeaders());
 app.use(logger());
 
+// SEO prevention + clickjacking protection on all API responses
+app.use("*", async (c, next) => {
+  await next();
+  c.header("X-Robots-Tag", "noindex, nofollow");
+  c.header("X-Frame-Options", "DENY");
+});
+
 app.get("/health", (c) => c.json({ status: "ok" }));
 
 app.get("/health/azure", async (c) => {
-  const firstTenant = Object.values(tenantMap)[0];
+  const firstTenant = Object.values(tenantsByOrg)[0];
   if (!firstTenant) {
     return c.json({ status: "error", error: "No tenants configured" }, 500);
   }
