@@ -5,7 +5,7 @@ A full-stack sprint management dashboard that connects to Azure DevOps and displ
 ## Tech Stack
 
 - **Frontend:** React 19, TypeScript, Vite, Tailwind CSS 4, TanStack React Query, Recharts, GSAP
-- **Backend:** Hono, WorkOS (auth), Azure DevOps API
+- **Backend:** Hono (runs on Bun locally, Vercel Edge in production), WorkOS (auth), Azure DevOps API
 - **Runtime:** Bun
 - **Deployment:** Vercel (edge functions)
 
@@ -38,15 +38,19 @@ A full-stack sprint management dashboard that connects to Azure DevOps and displ
    cp .env.example .env
    ```
 
-4. Fill in the required environment variables:
+4. Fill in the environment variables:
 
-   | Variable | Description |
-   |---|---|
-   | `WORKOS_API_KEY` | WorkOS API key (server-side) |
-   | `WORKOS_CLIENT_ID` | WorkOS client ID (server-side) |
-   | `VITE_WORKOS_CLIENT_ID` | WorkOS client ID (client-side) |
-   | `AZURE_DEVOPS_ORG` | Azure DevOps organization name |
-   | `AZURE_DEVOPS_PAT` | Azure DevOps Personal Access Token |
+   | Variable | Required | Description |
+   |---|---|---|
+   | `WORKOS_API_KEY` | Yes | WorkOS API key (server-side) |
+   | `WORKOS_CLIENT_ID` | Yes | WorkOS client ID (server-side) |
+   | `VITE_WORKOS_CLIENT_ID` | Yes | WorkOS client ID (client-side) |
+   | `AZURE_DEVOPS_ORG` | Yes | Azure DevOps organization name |
+   | `AZURE_DEVOPS_PAT` | Yes | Azure DevOps Personal Access Token |
+   | `APP_DOMAIN` | No | Tenant URL domain (default: `dashboard.velais.com`) |
+   | `VITE_APP_DOMAIN` | No | Same domain, exposed to the browser |
+   | `CRON_SECRET` | No | Shared secret for `/api/tenants`; generate with `openssl rand -base64 32` |
+   | `VITE_DEV_TENANT_SLUG` | No | Override tenant slug on localhost to bypass subdomain routing |
 
 5. Start the development servers:
 
@@ -54,7 +58,9 @@ A full-stack sprint management dashboard that connects to Azure DevOps and displ
    bun run dev
    ```
 
-   This starts the Vite client on `http://localhost:5173` and the Hono API server on `http://localhost:3001`.
+   This starts the Hono API server on `https://localhost:3001` and the Vite client on `https://localhost:5173`. The client uses `vite-plugin-mkcert` for a local TLS certificate, which is required for subdomain-based tenant routing.
+
+   In development, tenants are accessed via `lvh.me` subdomains (e.g., `https://foresound-srl.lvh.me:5173`). To bypass subdomain routing on plain `localhost`, set `VITE_DEV_TENANT_SLUG` in your `.env` file to the desired tenant slug.
 
 ## Scripts
 
@@ -100,7 +106,12 @@ server/               Hono backend
   middleware/
     auth.ts           WorkOS JWT verification; extracts tenant + userId from claims
     cache.ts          In-memory cache (10-min TTL, ETag, two-pass LRU at 500 entries)
-  routes/             stories, summary, iterations endpoints
+    secret.ts         Shared-secret middleware for internal endpoints; fails closed if CRON_SECRET is unset
+  routes/
+    stories.ts        User Stories for the current sprint
+    summary.ts        Sprint summary with state/assignee/team breakdowns
+    iterations.ts     Current iteration info (dates, days remaining)
+    tenants.ts        GET /api/tenants — lists registered tenants for internal tools
   services/
     azure-devops.ts   Azure DevOps WIQL client (30s timeout, 200-item batch, WIQL escaping)
     transform.ts      Work item → ClientStory transformation; buildSummary; buildIterationInfo
@@ -131,7 +142,11 @@ Users authenticate via WorkOS AuthKit. The backend verifies JWT tokens on every 
 
 ### Multi-Tenancy
 
-Each organization ID maps to an Azure DevOps project, team, and slug via `server/tenants.ts`. Cache keys are scoped per tenant to prevent data leaks. The resolved project name from `SprintSummary` is displayed in the dashboard header.
+Tenants are identified by a short slug (e.g., `foresound-srl`) and accessed via subdomain routing. In production, each tenant is served at `{slug}.dashboard.velais.com`; in development, `{slug}.lvh.me:5173` is used. The `extractSubdomain` utility (exported from `shared/tenants.ts`) resolves the current tenant from the hostname.
+
+Tenant definitions live in `shared/tenants.ts` as a readonly array of `TenantEntry` objects (`slug`, `orgId`, `displayName`). Azure DevOps configuration (`project`, `team`) is kept separately in `server/tenants.ts` and never exposed to clients. The organization ID extracted from the WorkOS JWT is used to look up the matching `TenantConfig` on the server.
+
+Cache keys are scoped per tenant (`{slug}:{pathname}:{search}`) to prevent cross-tenant data leaks. The resolved project name from `SprintSummary` is displayed in the dashboard header.
 
 ### Caching
 
@@ -170,13 +185,14 @@ GSAP (`gsap` + `@gsap/react`) drives all motion. The `CustomEase` plugin is regi
 |---|---|---|
 | `GET /api/health` | No | Health check |
 | `GET /api/health/azure` | No | Azure DevOps connectivity check |
-| `GET /api/stories` | Yes | Fetch User Stories for the current sprint |
-| `GET /api/summary` | Yes | Fetch sprint summary with state/assignee/team breakdowns |
-| `GET /api/iterations` | Yes | Fetch current iteration info (dates, days remaining) |
+| `GET /api/stories` | Yes (WorkOS JWT) | Fetch User Stories for the current sprint |
+| `GET /api/summary` | Yes (WorkOS JWT) | Fetch sprint summary with state/assignee/team breakdowns |
+| `GET /api/iterations` | Yes (WorkOS JWT) | Fetch current iteration info (dates, days remaining) |
+| `GET /api/tenants` | Yes (`CRON_SECRET` bearer token) | Lists registered tenants for internal tools; does not expose Azure DevOps config |
 
 ## Deployment
 
-Deployed on Vercel. The `vercel.json` rewrites `/api/*` to the Hono edge function and all other routes to the SPA.
+Deployed on Vercel. The `vercel.json` rewrites `/api/*` to the Hono edge function and all other routes to the SPA. All responses include `X-Robots-Tag: noindex, nofollow` and `X-Frame-Options: DENY` security headers.
 
 ## License
 
