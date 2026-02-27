@@ -4,9 +4,11 @@ import { secureHeaders } from "hono/secure-headers";
 import type { AuthEnv } from "./middleware/auth.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { cacheMiddleware } from "./middleware/cache.js";
+import { secretMiddleware } from "./middleware/secret.js";
 import iterations from "./routes/iterations.js";
 import stories from "./routes/stories.js";
 import summary from "./routes/summary.js";
+import tenantsRoute from "./routes/tenants.js";
 import { getCurrentIteration } from "./services/azure-devops.js";
 import { tenantsByOrg } from "./tenants.js";
 
@@ -46,6 +48,9 @@ app.get("/health/azure", async (c) => {
     );
   }
 });
+
+app.use("/tenants", secretMiddleware);
+app.route("/tenants", tenantsRoute);
 
 app.use("*", authMiddleware);
 app.use("*", cacheMiddleware());

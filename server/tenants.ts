@@ -27,6 +27,11 @@ export const tenantsByOrg: Record<string, TenantConfig> = {
     project: "Kablee Srl -  Custom AI Product Development",
     team: "Kablee Srl -  Custom AI Product Development Team",
   },
+  org_01KJFM2NQV5F64BCZBF4C4462V: {
+    slug: "deals-sa",
+    project: "",
+    team: ""
+  }
 };
 
 export function resolveTenant(orgId: string): TenantConfig | null {

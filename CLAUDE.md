@@ -43,18 +43,21 @@ bun run format                 # biome check --fix .
   - `lib/chart-colors.ts` — Recharts color palette
 - `server/` — Hono backend
   - `dev.ts` — Development entry point; validates required env vars at startup, then dynamically imports `app.ts`; runs on `PORT` env var or 3001
-  - `app.ts` — Hono app root; registers `secureHeaders`, logger, health routes, `authMiddleware`, `cacheMiddleware()`, and sub-routers; `notFound` + global error handler
+  - `app.ts` — Hono app root; registers `secureHeaders`, logger, health routes, `secretMiddleware` + `tenantsRoute` on `/tenants`, then `authMiddleware`, `cacheMiddleware()`, and sub-routers; `notFound` + global error handler
   - `middleware/auth.ts` — WorkOS JWT verification via JWKS; health routes bypass auth; sets `tenant` and `userId` on Hono context; returns 403 for unknown orgs
   - `middleware/cache.ts` — In-memory GET cache; 10-min TTL, ETag + `If-None-Match` support, `Cache-Control: private, max-age=600`; two-pass LRU eviction (expire → oldest single entry) at 500 entries; cache key is `{tenantSlug}:{pathname}:{search}`
+  - `middleware/secret.ts` — Shared-secret middleware for internal endpoints; reads `Authorization: Bearer <CRON_SECRET>` from `process.env`; returns 503 if `CRON_SECRET` is unset (fail-closed), 401 if header is missing or wrong, calls `next()` on success
   - `routes/stories.ts` — Delegates to `fetchCurrentSprintStories`; returns `ClientStory[]`
   - `routes/summary.ts` — Delegates to `fetchCurrentSprintStories`; calls `buildSummary`; returns `SprintSummary`
   - `routes/iterations.ts` — Fetches current iteration only; calls `buildIterationInfo`; returns `IterationInfo`
+  - `routes/tenants.ts` — GET `/api/tenants`; iterates `tenants` from `shared/tenants.ts`, cross-references `tenantsByOrg` from `server/tenants.ts`, filters out entries with empty `project`/`team`, returns `TenantListItem[]` (`slug`, `displayName`, `orgId`, `url`); does NOT expose Azure DevOps config; used by internal tools (velais-tools-home) to dynamically list client dashboard links; `url` is `https://${slug}.${APP_DOMAIN}` (defaults to `dashboard.velais.com`)
   - `services/azure-devops.ts` — Azure DevOps WIQL client; 30s `AbortController` timeout per request; WIQL injection escaping via `wiqlEscape()`; 200-item parallel batch fetches; exports `AzureWorkItem` and `AzureIteration` types; redacted `[azure]` log lines on error
   - `services/transform.ts` — `transformWorkItem()` (AzureWorkItem → ClientStory), `buildSummary()` / `buildIterationInfo()` (both use shared `computeSprintDays` helper); imports `AzureWorkItem` from `azure-devops.ts`
   - `services/sprint.ts` — `fetchCurrentSprintStories(tenant)` — shared fetch chain (iteration → WIQL → work item details → transform) used by stories and summary routes
-  - `tenants.ts` — `TenantConfig` (`slug`, `project`, `team`); `tenantMap` (orgId → config); `resolveTenant(orgId)`
+  - `tenants.ts` — Re-exports `TenantEntry`, `tenants`, `validSlugs`, `slugToOrgId`, `orgIdToSlug`, `slugToDisplayName`, and `extractSubdomain` from `shared/`; defines `TenantConfig` (`slug`, `project`, `team`); `tenantsByOrg` (orgId → `TenantConfig`); `resolveTenant(orgId)`; `resolveTenantBySlug(slug)`
 - `shared/` — Types and utilities shared between client and server
   - `types/index.ts` — `ClientStory`, `SprintSummary`, `StoryState`, `Priority`, `AssigneeSummary`, `TeamMember`, `IterationInfo`
+  - `tenants.ts` — `TenantEntry` interface (`slug`, `orgId`, `displayName`); `tenants` readonly array (source of truth for all registered clients); derived lookup maps: `validSlugs`, `slugToOrgId`, `orgIdToSlug`, `slugToDisplayName`
   - `utils.ts` — `getInitials(name)` — splits display name and returns up to 2 uppercase initials
 - `api/[[...route]].ts` — Vercel edge function catch-all (proxies to Hono app)
 
@@ -127,14 +130,14 @@ Org ID from JWT maps to `TenantConfig` in `server/tenants.ts` (`slug`, `project`
 - **Formatting:** Biome with 2-space indent, double quotes
 - **Styling:** Tailwind utilities + `cn()` helper (clsx + twMerge)
 - **shadcn UI:** New York style, configured via `components.json`
-- **API auth:** Bearer token in Authorization header, verified via WorkOS on every request (health routes exempt)
+- **API auth:** Bearer token in Authorization header, verified via WorkOS on every request; health routes and `/api/tenants` are exempt from WorkOS auth — `/api/tenants` uses `secretMiddleware` (shared `CRON_SECRET`) instead
 - **Error flow:** API 401 → `window.location.href = "/"` on client; Azure errors → 502; unknown org → 403
 - **Table filtering:** client-side, computed via `useMemo`; supports state, assignee, and free-text search across title + tags; sorting by state, assignee, or priority
 - **Shared utilities:** Always import `getInitials` from `@shared/utils` — it is used by both `transform.ts` (server) and any client component that needs initials
 
 ### Environment Variables
 
-See `.env.example`. Required: `WORKOS_API_KEY`, `WORKOS_CLIENT_ID`, `VITE_WORKOS_CLIENT_ID`, `AZURE_DEVOPS_ORG`, `AZURE_DEVOPS_PAT`. The dev server (`server/dev.ts`) validates these at startup and exits with a clear message if any are missing.
+See `.env.example`. Required: `WORKOS_API_KEY`, `WORKOS_CLIENT_ID`, `VITE_WORKOS_CLIENT_ID`, `AZURE_DEVOPS_ORG`, `AZURE_DEVOPS_PAT`. The dev server (`server/dev.ts`) validates these at startup and exits with a clear message if any are missing. Optional: `CRON_SECRET` — shared secret for the `/api/tenants` endpoint; not validated at startup, but `secretMiddleware` fails closed with 503 if the variable is absent. `APP_DOMAIN` — overrides the tenant URL domain (default: `dashboard.velais.com`).
 
 ### Deployment
 
