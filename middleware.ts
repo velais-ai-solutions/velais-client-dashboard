@@ -38,6 +38,11 @@ export default function middleware(
     return undefined;
   }
 
+  // Tenant list endpoint — always pass through (has its own secretMiddleware auth)
+  if (url.pathname === "/api/tenants") {
+    return undefined;
+  }
+
   // Serve dynamic robots.txt — block all crawlers
   if (url.pathname === "/robots.txt") {
     return new Response("User-agent: *\nDisallow: /\n", {
