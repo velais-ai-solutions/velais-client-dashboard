@@ -1,4 +1,8 @@
-import type { Priority, StoryState } from "@shared/types/index.js";
+import type {
+  Priority,
+  StoryState,
+  WorkItemType,
+} from "@shared/types/index.js";
 
 export const STATE_COLORS: Record<StoryState, string> = {
   Planned: "bg-status-inactive-muted text-status-inactive",
@@ -14,6 +18,11 @@ export const PRIORITY_COLORS: Record<Priority, string> = {
   Medium: "bg-status-review-muted text-status-review",
   Low: "bg-status-inactive-muted text-status-inactive",
   Unset: "bg-bg-surface text-text-secondary",
+};
+
+export const TYPE_COLORS: Record<WorkItemType, string> = {
+  story: "bg-status-building-muted text-status-building",
+  bug: "bg-status-failed-muted text-status-failed",
 };
 
 export const STATE_ORDER: StoryState[] = [

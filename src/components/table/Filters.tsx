@@ -1,4 +1,4 @@
-import type { StoryState } from "@shared/types/index.js";
+import type { StoryState, WorkItemType } from "@shared/types/index.js";
 import { STATE_ORDER } from "../../lib/constants.js";
 import { Input } from "../ui/input.js";
 import {
@@ -11,20 +11,24 @@ import {
 
 interface FiltersProps {
   stateFilter: StoryState | "All";
+  typeFilter: WorkItemType | "All";
   assigneeFilter: string;
   searchQuery: string;
   assignees: string[];
   onStateChange: (state: StoryState | "All") => void;
+  onTypeChange: (type: WorkItemType | "All") => void;
   onAssigneeChange: (assignee: string) => void;
   onSearchChange: (query: string) => void;
 }
 
 export function Filters({
   stateFilter,
+  typeFilter,
   assigneeFilter,
   searchQuery,
   assignees,
   onStateChange,
+  onTypeChange,
   onAssigneeChange,
   onSearchChange,
 }: FiltersProps) {
@@ -48,6 +52,20 @@ export function Filters({
       </Select>
 
       <Select
+        value={typeFilter}
+        onValueChange={(v) => onTypeChange(v as WorkItemType | "All")}
+      >
+        <SelectTrigger size="sm">
+          <SelectValue placeholder="All Types" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="All">All Types</SelectItem>
+          <SelectItem value="story">Story</SelectItem>
+          <SelectItem value="bug">Bug</SelectItem>
+        </SelectContent>
+      </Select>
+
+      <Select
         value={assigneeFilter || "all"}
         onValueChange={(v) => onAssigneeChange(v === "all" ? "" : v)}
       >
@@ -66,7 +84,7 @@ export function Filters({
 
       <Input
         type="text"
-        placeholder="Search stories..."
+        placeholder="Search items..."
         value={searchQuery}
         onChange={(e) => onSearchChange(e.target.value)}
         className="h-8 w-48"

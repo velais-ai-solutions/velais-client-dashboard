@@ -30,11 +30,18 @@ export function KanbanCard({ story }: KanbanCardProps) {
           </TooltipTrigger>
           <TooltipContent>{story.assignee}</TooltipContent>
         </Tooltip>
-        {story.effort > 0 && (
-          <Badge className="bg-bg-surface text-text-secondary text-xs rounded-sm">
-            {story.effort} pts
-          </Badge>
-        )}
+        <div className="flex items-center gap-1.5">
+          {story.type === "bug" && (
+            <Badge className="bg-status-failed-muted border-status-failed text-status-failed text-xs rounded-sm">
+              Bug
+            </Badge>
+          )}
+          {story.effort > 0 && (
+            <Badge className="bg-bg-surface text-text-secondary text-xs rounded-sm">
+              {story.effort} pts
+            </Badge>
+          )}
+        </div>
       </div>
       {/* {story.priority !== "Unset" && (
         <div className="border-t border-border-subtle px-4 py-2.5">

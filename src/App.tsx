@@ -1,3 +1,4 @@
+import { slugToOrgId } from "@shared/tenants.js";
 import { useAuth } from "@workos-inc/authkit-react";
 import {
   Activity,
@@ -19,7 +20,6 @@ import { useStories } from "./hooks/useStories.js";
 import { useSummary } from "./hooks/useSummary.js";
 import { setGetAccessToken } from "./lib/api.js";
 import { useTenant } from "./lib/tenant.js";
-import { slugToOrgId } from "@shared/tenants.js";
 
 const StateBreakdown = lazy(() =>
   import("./components/analytics/StateBreakdown.js").then((m) => ({

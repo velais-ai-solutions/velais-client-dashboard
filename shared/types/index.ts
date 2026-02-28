@@ -7,7 +7,10 @@ export type StoryState =
 
 export type Priority = "Critical" | "High" | "Medium" | "Low" | "Unset";
 
+export type WorkItemType = "story" | "bug";
+
 export interface ClientStory {
+  type: WorkItemType;
   id: number;
   title: string;
   state: StoryState;

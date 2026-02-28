@@ -30,8 +30,8 @@ export const tenantsByOrg: Record<string, TenantConfig> = {
   org_01KJFM2NQV5F64BCZBF4C4462V: {
     slug: "deals-sa",
     project: "",
-    team: ""
-  }
+    team: "",
+  },
 };
 
 export function resolveTenant(orgId: string): TenantConfig | null {

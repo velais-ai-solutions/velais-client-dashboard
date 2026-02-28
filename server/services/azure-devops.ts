@@ -132,7 +132,7 @@ export async function queryWorkItems(
     SELECT [System.Id]
     FROM WorkItems
     WHERE [System.TeamProject] = '${wiqlEscape(project)}'
-      AND [System.WorkItemType] = 'User Story'
+      AND [System.WorkItemType] IN ('User Story', 'Bug')
       AND [System.IterationPath] UNDER '${wiqlEscape(iterationPath)}'
     ORDER BY [Microsoft.VSTS.Common.Priority] ASC, [System.ChangedDate] DESC
   `;
@@ -148,6 +148,7 @@ export async function getWorkItemDetails(
 
   const fields = [
     "System.Id",
+    "System.WorkItemType",
     "System.Title",
     "System.State",
     "System.AssignedTo",

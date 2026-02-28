@@ -6,6 +6,7 @@ import type {
   SprintSummary,
   StoryState,
   TeamMember,
+  WorkItemType,
 } from "../../shared/types/index.js";
 import { getInitials } from "../../shared/utils.js";
 import type { AzureWorkItem } from "./azure-devops.js";
@@ -78,6 +79,10 @@ function computeSprintDays(
   };
 }
 
+function mapWorkItemType(azureType: string): WorkItemType {
+  return azureType === "Bug" ? "bug" : "story";
+}
+
 export function transformWorkItem(item: AzureWorkItem): ClientStory {
   const fields = item.fields;
   const assignedTo = fields["System.AssignedTo"] as
@@ -88,6 +93,9 @@ export function transformWorkItem(item: AzureWorkItem): ClientStory {
 
   return {
     id: item.id,
+    type: mapWorkItemType(
+      (fields["System.WorkItemType"] as string) ?? "User Story",
+    ),
     title: (fields["System.Title"] as string) ?? "",
     state: mapState((fields["System.State"] as string) ?? "New"),
     assignee,

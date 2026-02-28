@@ -1,6 +1,11 @@
-import type { ClientStory, Priority, StoryState } from "@shared/types/index.js";
+import type {
+  ClientStory,
+  Priority,
+  StoryState,
+  WorkItemType,
+} from "@shared/types/index.js";
 import { useMemo, useState } from "react";
-import { STATE_COLORS, STATE_ORDER } from "../../lib/constants.js";
+import { STATE_COLORS, STATE_ORDER, TYPE_COLORS } from "../../lib/constants.js";
 import { Badge } from "../ui/Badge.js";
 import { Skeleton } from "../ui/Skeleton.js";
 import {
@@ -44,6 +49,7 @@ export function StoriesTable({ stories, isLoading }: StoriesTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>("state");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [stateFilter, setStateFilter] = useState<StoryState | "All">("All");
+  const [typeFilter, setTypeFilter] = useState<WorkItemType | "All">("All");
   const [assigneeFilter, setAssigneeFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -58,6 +64,7 @@ export function StoriesTable({ stories, isLoading }: StoriesTableProps) {
     const result: ClientStory[] = [];
     for (const story of stories) {
       if (stateFilter !== "All" && story.state !== stateFilter) continue;
+      if (typeFilter !== "All" && story.type !== typeFilter) continue;
       if (assigneeFilter && story.assignee !== assigneeFilter) continue;
       if (
         lowerQuery &&
@@ -84,7 +91,15 @@ export function StoriesTable({ stories, isLoading }: StoriesTableProps) {
       }
       return sortDir === "asc" ? cmp : -cmp;
     });
-  }, [stories, stateFilter, assigneeFilter, searchQuery, sortKey, sortDir]);
+  }, [
+    stories,
+    stateFilter,
+    typeFilter,
+    assigneeFilter,
+    searchQuery,
+    sortKey,
+    sortDir,
+  ]);
 
   function toggleSort(key: SortKey) {
     if (sortKey === key) {
@@ -107,14 +122,16 @@ export function StoriesTable({ stories, isLoading }: StoriesTableProps) {
   return (
     <div data-gsap="card" className="mb-6">
       <h3 className="mb-3 font-heading text-lg font-semibold tracking-[0.12em] uppercase text-text-primary">
-        Stories
+        Work Items
       </h3>
       <Filters
         stateFilter={stateFilter}
+        typeFilter={typeFilter}
         assigneeFilter={assigneeFilter}
         searchQuery={searchQuery}
         assignees={assignees}
         onStateChange={setStateFilter}
+        onTypeChange={setTypeFilter}
         onAssigneeChange={setAssigneeFilter}
         onSearchChange={setSearchQuery}
       />
@@ -122,6 +139,7 @@ export function StoriesTable({ stories, isLoading }: StoriesTableProps) {
         <TableHeader>
           <TableRow>
             <TableHead>ID</TableHead>
+            <TableHead>Type</TableHead>
             <TableHead>Title</TableHead>
             <TableHead
               className="cursor-pointer"
@@ -142,6 +160,11 @@ export function StoriesTable({ stories, isLoading }: StoriesTableProps) {
           {filtered.map((story) => (
             <TableRow key={story.id}>
               <TableCell className="text-text-secondary">{story.id}</TableCell>
+              <TableCell>
+                <Badge className={TYPE_COLORS[story.type]}>
+                  {story.type === "bug" ? "Bug" : "Story"}
+                </Badge>
+              </TableCell>
               <TableCell className="text-text-primary font-medium">
                 {story.title}
               </TableCell>
