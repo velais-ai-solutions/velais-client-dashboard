@@ -7,7 +7,6 @@
         "@gsap/react": "^2.1.2",
         "@hono/node-server": "^1.19.9",
         "@tanstack/react-query": "^5.90.21",
-        "@workos-inc/authkit-react": "^0.16.0",
         "@workos-inc/node": "^8.5.0",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
@@ -411,10 +410,6 @@
     "@types/react-dom": ["@types/react-dom@19.2.3", "", { "peerDependencies": { "@types/react": "^19.2.0" } }, "sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ=="],
 
     "@vitejs/plugin-react": ["@vitejs/plugin-react@5.1.4", "", { "dependencies": { "@babel/core": "^7.29.0", "@babel/plugin-transform-react-jsx-self": "^7.27.1", "@babel/plugin-transform-react-jsx-source": "^7.27.1", "@rolldown/pluginutils": "1.0.0-rc.3", "@types/babel__core": "^7.20.5", "react-refresh": "^0.18.0" }, "peerDependencies": { "vite": "^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0" } }, "sha512-VIcFLdRi/VYRU8OL/puL7QXMYafHmqOnwTZY50U1JPlCNj30PxCMx65c494b1K9be9hX83KVt0+gTEwTWLqToA=="],
-
-    "@workos-inc/authkit-js": ["@workos-inc/authkit-js@0.19.0", "", {}, "sha512-/nyj2PrsV/dYJgtN+EBfKH8LUGeAXouH8nOOX/ybWe4i6yYacW3Txafbh35Ik7ze6rWbo7+ilVIURd14Ne/kCA=="],
-
-    "@workos-inc/authkit-react": ["@workos-inc/authkit-react@0.16.0", "", { "dependencies": { "@workos-inc/authkit-js": "0.19.0" }, "peerDependencies": { "react": ">=17" } }, "sha512-627CH9a8hqm1eHP0/8BOqUyTTqy3oPgB8+9dsU/SIRjfxQyCQAGjDmOiET/svBJgrkGW8cRfn8KECLV6b20Pqg=="],
 
     "@workos-inc/node": ["@workos-inc/node@8.5.0", "", { "dependencies": { "iron-webcrypto": "^2.0.0", "jose": "~6.1.0" } }, "sha512-p3eLKJgcIX0noqLBEHor+VQmUioDB+bxGnEbGRtkHUoR1Sxl19/TFmeSqXc+m2by45Mt6KcYyHeboidx2UHkuQ=="],
 

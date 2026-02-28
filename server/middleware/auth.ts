@@ -19,7 +19,10 @@ const jwks = createRemoteJWKSet(
 const appDomain = process.env.APP_DOMAIN ?? "dashboard.velais.com";
 
 export async function authMiddleware(c: Context<AuthEnv>, next: Next) {
-  if (c.req.path.startsWith("/api/health")) {
+  if (
+    c.req.path.startsWith("/api/health") ||
+    c.req.path.startsWith("/api/auth")
+  ) {
     await next();
     return;
   }

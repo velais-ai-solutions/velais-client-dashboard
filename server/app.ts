@@ -5,6 +5,7 @@ import type { AuthEnv } from "./middleware/auth.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { cacheMiddleware } from "./middleware/cache.js";
 import { secretMiddleware } from "./middleware/secret.js";
+import authRoutes from "./routes/auth.js";
 import iterations from "./routes/iterations.js";
 import stories from "./routes/stories.js";
 import summary from "./routes/summary.js";
@@ -48,6 +49,8 @@ app.get("/health/azure", async (c) => {
     );
   }
 });
+
+app.route("/auth", authRoutes);
 
 app.use("/tenants", secretMiddleware);
 app.route("/tenants", tenantsRoute);

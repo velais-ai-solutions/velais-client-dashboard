@@ -1,5 +1,4 @@
 import { slugToOrgId } from "@shared/tenants.js";
-import { useAuth } from "@workos-inc/authkit-react";
 import {
   Activity,
   lazy,
@@ -19,6 +18,7 @@ import { TooltipProvider } from "./components/ui/tooltip.js";
 import { useStories } from "./hooks/useStories.js";
 import { useSummary } from "./hooks/useSummary.js";
 import { setGetAccessToken } from "./lib/api.js";
+import { useServerAuth } from "./lib/auth.js";
 import { useTenant } from "./lib/tenant.js";
 
 const StateBreakdown = lazy(() =>
@@ -40,7 +40,7 @@ export function App() {
     signIn,
     signOut,
     getAccessToken,
-  } = useAuth();
+  } = useServerAuth();
   const tenant = useTenant();
   useEffect(() => {
     setGetAccessToken(getAccessToken);
