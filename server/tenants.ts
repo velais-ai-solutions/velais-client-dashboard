@@ -32,6 +32,11 @@ export const tenantsByOrg: Record<string, TenantConfig> = {
     project: "",
     team: "",
   },
+  org_01KJPR6VNF7CW2AAKQ92NFW3G4: {
+    slug: "reviot-srl",
+    project: "RevIoT - Software Development and Maintenance",
+    team: "RevIoT - Software Development and Maintenance Team",
+  }
 };
 
 export function resolveTenant(orgId: string): TenantConfig | null {

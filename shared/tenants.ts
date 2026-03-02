@@ -15,6 +15,16 @@ export const tenants: readonly TenantEntry[] = [
     orgId: "org_01KJ9V64J25YSFA4RCKZ9FGPTC",
     displayName: "Kablee Srl",
   },
+  {
+    slug: "deals-sa",
+    orgId: "org_01KJFM2NQV5F64BCZBF4C4462V",
+    displayName: "Deals SA",
+  },
+  {
+    slug: "reviot-srl",
+    orgId: "org_01KJPR6VNF7CW2AAKQ92NFW3G4",
+    displayName: "RevIoT Srl",
+  }
 ];
 
 export const validSlugs: ReadonlySet<string> = new Set(
