@@ -14,7 +14,7 @@ export async function fetchCurrentSprintStories(tenant: TenantConfig) {
   console.log(
     `[sprint] Iteration: ${iteration.name} | Path: ${iteration.path}`,
   );
-  const ids = await queryWorkItems(tenant.project, iteration.path);
+  const ids = await queryWorkItems(tenant.project);
   console.log(`[sprint] Work item IDs: ${ids.length}`);
   const workItems = await getWorkItemDetails(ids);
   const stories = workItems.map(transformWorkItem);
