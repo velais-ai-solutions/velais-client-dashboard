@@ -8,7 +8,7 @@ interface CacheEntry {
 }
 
 const cache = new Map<string, CacheEntry>();
-const DEFAULT_TTL = 10 * 60 * 1000; // 10 minutes
+const DEFAULT_TTL = 2 * 60 * 1000; // 2 minutes
 const MAX_ENTRIES = 500;
 
 function generateEtag(body: string): string {
@@ -52,7 +52,7 @@ export function cacheMiddleware(ttl = DEFAULT_TTL) {
 
       c.header("X-Cache", "HIT");
       c.header("ETag", cached.etag);
-      c.header("Cache-Control", "private, max-age=600");
+      c.header("Cache-Control", "private, max-age=120");
       c.header("Content-Type", "application/json; charset=UTF-8");
       return c.body(cached.body, 200);
     }
@@ -84,7 +84,7 @@ export function cacheMiddleware(ttl = DEFAULT_TTL) {
 
       c.header("X-Cache", "MISS");
       c.header("ETag", etag);
-      c.header("Cache-Control", "private, max-age=600");
+      c.header("Cache-Control", "private, max-age=120");
     }
   };
 }
