@@ -52,7 +52,7 @@ export function cacheMiddleware(ttl = DEFAULT_TTL) {
 
       c.header("X-Cache", "HIT");
       c.header("ETag", cached.etag);
-      c.header("Cache-Control", "private, max-age=120");
+      c.header("Cache-Control", "private, no-store");
       c.header("Content-Type", "application/json; charset=UTF-8");
       return c.body(cached.body, 200);
     }
@@ -84,7 +84,7 @@ export function cacheMiddleware(ttl = DEFAULT_TTL) {
 
       c.header("X-Cache", "MISS");
       c.header("ETag", etag);
-      c.header("Cache-Control", "private, max-age=120");
+      c.header("Cache-Control", "private, no-store");
     }
   };
 }
