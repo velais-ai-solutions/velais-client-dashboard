@@ -29,8 +29,8 @@ export const tenantsByOrg: Record<string, TenantConfig> = {
   },
   org_01KJFM2NQV5F64BCZBF4C4462V: {
     slug: "deals-sa",
-    project: "",
-    team: "",
+    project: "Deals SA - AI Transformation for Supply Chain",
+    team: "Deals SA - AI Transformation for Supply Chain Team",
   },
   org_01KJPR6VNF7CW2AAKQ92NFW3G4: {
     slug: "reviot-srl",
