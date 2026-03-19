@@ -87,7 +87,7 @@ React hooks (useStories/useSummary)
 
 | Azure State | StoryState |
 |---|---|
-| New, To Do | Planned |
+| To Do | Planned |
 | Active, In Progress | In Progress |
 | Resolved, QA, In Review | In Review |
 | Closed, Done, Completed | Completed |

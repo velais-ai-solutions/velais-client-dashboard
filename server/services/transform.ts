@@ -12,7 +12,6 @@ import { getInitials } from "../../shared/utils.js";
 import type { AzureWorkItem } from "./azure-devops.js";
 
 const STATE_MAP: Record<string, StoryState> = {
-  New: "Planned",
   "To Do": "Planned",
   Active: "In Progress",
   "In Progress": "In Progress",
