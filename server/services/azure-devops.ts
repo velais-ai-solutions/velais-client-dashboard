@@ -132,7 +132,7 @@ export async function queryWorkItems(
     FROM WorkItems
     WHERE [System.TeamProject] = '${wiqlEscape(project)}'
       AND [System.WorkItemType] IN ('User Story', 'Bug')
-      AND [System.State] <> 'New'
+      AND [System.State] NOT IN ('New', 'Backlog')
     ORDER BY [Microsoft.VSTS.Common.Priority] ASC, [System.ChangedDate] DESC
   `;
 
