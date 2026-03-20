@@ -123,6 +123,7 @@ export async function getCurrentIteration(
 
 export async function queryWorkItems(
   project: string,
+  iterationPath: string,
 ): Promise<number[]> {
   const encodedProject = encodeURIComponent(project);
   const url = `https://dev.azure.com/${org}/${encodedProject}/_apis/wit/wiql?api-version=7.1`;
@@ -131,6 +132,10 @@ export async function queryWorkItems(
     SELECT [System.Id]
     FROM WorkItems
     WHERE [System.TeamProject] = '${wiqlEscape(project)}'
+      AND (
+        [System.IterationPath] = '${wiqlEscape(iterationPath)}'
+        OR [System.IterationPath] = '${wiqlEscape(project)}'
+      )
       AND [System.WorkItemType] IN ('User Story', 'Bug')
       AND [System.State] NOT IN ('New', 'Backlog')
     ORDER BY [Microsoft.VSTS.Common.Priority] ASC, [System.ChangedDate] DESC
